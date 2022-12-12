@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +26,8 @@ import com.swax.schooltracker.R;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,7 +46,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
     private LocalDate mTermStart = LocalDate.now();
     private LocalDate mTermEnd = LocalDate.now();
     private List<Integer> mTermAssociatedCourseIds = new ArrayList<>();
-    private List<String> mTermDeleteCourseStrings = new ArrayList<>();
+    private List<String> mTermDeleteCourseStrings;
     private List<String> mTermAddCourseStrings;
     private List<Course> mTermAssociatedCourses = new ArrayList<>();
     private Repository repo = new Repository(getApplication());
@@ -53,6 +56,8 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
     private String myFormat = "MM/dd/yyyy";
     private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(myFormat);
+    private EditText termNameEditText;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +69,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
             mTerm = repo.getTermById(getIntent().getIntExtra("id", 0));
         }
 
-        EditText termNameEditText = findViewById(R.id.termNameEditText);
+        termNameEditText = findViewById(R.id.termNameEditText);
         TextView termStartTextView = findViewById(R.id.termStartTextView);
         TextView termEndTextView = findViewById(R.id.termEndTextView);
 
@@ -94,6 +99,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 myCalendar.set(Calendar.MONTH,monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 termStartTextView.setText(sdf.format(myCalendar.getTime()));
+                mTermStart = LocalDateTime.ofInstant(myCalendar.toInstant(), ZoneId.systemDefault()).toLocalDate();
             }
         };
 
@@ -119,6 +125,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 myCalendar.set(Calendar.MONTH,monthOfYear);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
                 termEndTextView.setText(sdf.format(myCalendar.getTime()));
+                mTermEnd = LocalDateTime.ofInstant(myCalendar.toInstant(), ZoneId.systemDefault()).toLocalDate();
             }
         };
 
@@ -129,7 +136,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
         }
 
         populateRecyclerView();
-        populateAddSpinner(false);
+        populateAddSpinner();
         populateDeleteSpinner();
 
     }
@@ -145,7 +152,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                     mTermAssociatedCourses.add(addSelectedCourse);
                     mTermAssociatedCourseIds.add(addSelectedCourse.getCourseId());
                     populateRecyclerView();
-                    populateAddSpinner(false);
+                    populateAddSpinner();
                     populateDeleteSpinner();
                 }
                 break;
@@ -156,7 +163,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                     mTermAssociatedCourses.remove(position - 1);
                     mTermAssociatedCourseIds.remove(deleteSelectedCourse.getCourseId());
                     populateRecyclerView();
-                    populateAddSpinner(true);
+                    populateAddSpinner();
                     populateDeleteSpinner();
                 }
                 break;
@@ -188,15 +195,29 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 return true;
             case R.id.save:
                 Log.d(LOG_ID, "You clicked save!");
+                mTerm.setTermName(termNameEditText.getText().toString());
+                mTerm.setTermStart(mTermStart);
+                mTerm.setTermEnd(mTermEnd);
+                mTerm.setTermCourses(mTermAssociatedCourseIds);
+                if(mTerm.getTermId() == null){
+                    repo.insert(mTerm);
+                } else {
+                    repo.update(mTerm);
+                }
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
+                if(mTerm.getTermId() != null){
+                    repo.delete(mTerm);
+                }
+                Intent intent = new Intent(TermActivity.this, TermListActivity.class);
+                startActivity(intent);
                 return true;
         }
         return false;
     }
 
-    public void populateAddSpinner(Boolean update){
+    public void populateAddSpinner(){
         //populate the first item so the drop down shows up right
         mTermAddCourseStrings = new ArrayList<>();
         mTermAddCourseStrings.add("Add");
@@ -236,13 +257,12 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void populateDeleteSpinner(){
-        if(mTermDeleteCourseStrings.isEmpty()){
-            //populate the first item so the drop down shows up right
-            mTermDeleteCourseStrings.add("Delete");
-            //populate the list of courses for the delete dropdown
-            for(Integer i : mTerm.getAssociatedCourses()){
-                mTermDeleteCourseStrings.add(repo.getCourseById(i).toString());
-            }
+        mTermDeleteCourseStrings = new ArrayList<>();
+        //populate the first item so the drop down shows up right
+        mTermDeleteCourseStrings.add("Delete");
+        //populate the list of courses for the delete dropdown
+        for(Integer i : mTerm.getAssociatedCourses()){
+            mTermDeleteCourseStrings.add(repo.getCourseById(i).toString());
         }
 
         Spinner deleteCourseSpinner = findViewById(R.id.termDetailDeleteCourseSpinner);
@@ -286,7 +306,4 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
         adaptor.setCourses(mTermAssociatedCourses);
     }
 
-    public void updateRecyclerView(){
-
-    }
 }
