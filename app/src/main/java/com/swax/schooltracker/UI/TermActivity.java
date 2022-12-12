@@ -1,31 +1,58 @@
 package com.swax.schooltracker.UI;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.swax.schooltracker.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import Database.Repository;
 import Entities.Course;
 import Entities.Term;
 
-public class TermActivity extends AppCompatActivity {
+public class TermActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
+    private String LOG_ID = "TermActivity";
     private Term mTerm;
-    private String mTermName = null;
-    private LocalDate mTermStart = null;
-    private LocalDate mTermEnd = null;
+    private String mTermName = "Enter Name";
+    private LocalDate mTermStart = LocalDate.now();
+    private LocalDate mTermEnd = LocalDate.now();
     private List<Integer> mTermAssociatedCourseIds = new ArrayList<>();
-    private List<String> mTermAssociatedCourseStrings = new ArrayList<>();
-
-    Repository repo = new Repository(getApplication());
+    private List<String> mTermDeleteCourseStrings = new ArrayList<>();
+    private List<String> mTermAddCourseStrings;
+    private List<Course> mTermAssociatedCourses = new ArrayList<>();
+    private Repository repo = new Repository(getApplication());
+    private DatePickerDialog.OnDateSetListener startDate;
+    private DatePickerDialog.OnDateSetListener endDate;
+    private final Calendar myCalendar = Calendar.getInstance();
+    private String myFormat = "MM/dd/yyyy";
+    private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(myFormat);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,15 +64,229 @@ public class TermActivity extends AppCompatActivity {
             mTerm = repo.getTermById(getIntent().getIntExtra("id", 0));
         }
 
-        //populate the list of courses for the add/remove dropdown
-        for(Integer i : mTerm.getAssociatedCourses()){
-            mTermAssociatedCourseStrings.add(repo.getCourseById(i).toString());
+        EditText termNameEditText = findViewById(R.id.termNameEditText);
+        TextView termStartTextView = findViewById(R.id.termStartTextView);
+        TextView termEndTextView = findViewById(R.id.termEndTextView);
+
+        termNameEditText.setHint(mTerm.getTermName());
+        termStartTextView.setText(mTerm.getTermStart().format(formatter));
+        termEndTextView.setText(mTerm.getTermEnd().format(formatter));
+
+        termStartTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    myCalendar.setTime(sdf.parse(termStartTextView.getText().toString()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                new DatePickerDialog(TermActivity.this, startDate, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        startDate=new DatePickerDialog.OnDateSetListener(){
+
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR,year);
+                myCalendar.set(Calendar.MONTH,monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                termStartTextView.setText(sdf.format(myCalendar.getTime()));
+            }
+        };
+
+        termEndTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    myCalendar.setTime(sdf.parse(termEndTextView.getText().toString()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                new DatePickerDialog(TermActivity.this, endDate, myCalendar
+                        .get(Calendar.YEAR), myCalendar.get(Calendar.MONTH),
+                        myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+
+        endDate=new DatePickerDialog.OnDateSetListener(){
+
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
+                myCalendar.set(Calendar.YEAR,year);
+                myCalendar.set(Calendar.MONTH,monthOfYear);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                termEndTextView.setText(sdf.format(myCalendar.getTime()));
+            }
+        };
+
+        mTermAssociatedCourseIds = mTerm.getAssociatedCourses();
+
+        for(Integer i : mTermAssociatedCourseIds){
+            mTermAssociatedCourses.add(repo.getCourseById(i));
+        }
+
+        populateRecyclerView();
+        populateAddSpinner(false);
+        populateDeleteSpinner();
+
+    }
+
+
+    @Override
+    public void onItemSelected(@NonNull AdapterView<?> parent, View view, int position, long id) {
+        switch(parent.getId()){
+            case R.id.termDetailAddCourseSpinner:
+                if(position!=0){
+                    String addSpinnerSelected = (String) mTermAddCourseStrings.get(position);
+                    Course addSelectedCourse = repo.getCourseFromString(addSpinnerSelected);
+                    mTermAssociatedCourses.add(addSelectedCourse);
+                    mTermAssociatedCourseIds.add(addSelectedCourse.getCourseId());
+                    populateRecyclerView();
+                    populateAddSpinner(false);
+                    populateDeleteSpinner();
+                }
+                break;
+            case R.id.termDetailDeleteCourseSpinner:
+                if(position!=0){
+                    String deleteSpinnerSelected = mTermDeleteCourseStrings.get(position);
+                    Course deleteSelectedCourse = repo.getCourseFromString(deleteSpinnerSelected);
+                    mTermAssociatedCourses.remove(position - 1);
+                    mTermAssociatedCourseIds.remove(deleteSelectedCourse.getCourseId());
+                    populateRecyclerView();
+                    populateAddSpinner(true);
+                    populateDeleteSpinner();
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        switch(parent.getId()){
+            case R.id.termDetailAddCourseSpinner:
+                Log.d(LOG_ID, "Nothing selected");
+                break;
+            case R.id.termDetailDeleteCourseSpinner:
+                Log.d(LOG_ID, "Nothing selected delete");
+                break;
+        }
+    }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_term, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                return true;
+            case R.id.save:
+                Log.d(LOG_ID, "You clicked save!");
+                return true;
+            case R.id.delete:
+                Log.d(LOG_ID, "You clicked delete!");
+                return true;
+        }
+        return false;
+    }
+
+    public void populateAddSpinner(Boolean update){
+        //populate the first item so the drop down shows up right
+        mTermAddCourseStrings = new ArrayList<>();
+        mTermAddCourseStrings.add("Add");
+        //populate the list of courses for the add dropdown
+        for(Course c : repo.getAllCourses()){
+            if(!mTermAssociatedCourseIds.contains(c.getCourseId()) ){
+                mTermAddCourseStrings.add(c.toString());
+            }
         }
 
         Spinner addCourseSpinner = findViewById(R.id.termDetailAddCourseSpinner);
-        ArrayAdapter<String> courseAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, mTermAssociatedCourseStrings);
+        ArrayAdapter<String> courseAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, mTermAddCourseStrings) {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.WHITE);
+                    textview.setBackgroundColor(Color.BLACK);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         addCourseSpinner.setAdapter(courseAdapter);
-        addCourseSpinner.setPrompt("Add Course");
+        addCourseSpinner.setOnItemSelectedListener(this);
+    }
+
+    public void populateDeleteSpinner(){
+        if(mTermDeleteCourseStrings.isEmpty()){
+            //populate the first item so the drop down shows up right
+            mTermDeleteCourseStrings.add("Delete");
+            //populate the list of courses for the delete dropdown
+            for(Integer i : mTerm.getAssociatedCourses()){
+                mTermDeleteCourseStrings.add(repo.getCourseById(i).toString());
+            }
+        }
+
+        Spinner deleteCourseSpinner = findViewById(R.id.termDetailDeleteCourseSpinner);
+        ArrayAdapter<String> courseAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, mTermDeleteCourseStrings) {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.WHITE);
+                    textview.setBackgroundColor(Color.BLACK);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+        deleteCourseSpinner.setAdapter(courseAdapter);
+        deleteCourseSpinner.setOnItemSelectedListener(this);
+    }
+
+    public void populateRecyclerView(){
+        RecyclerView termDetailRecyclerView = findViewById(R.id.termDetailRecyclerView);
+        if(mTermAssociatedCourses.isEmpty()){
+            for(Integer i : mTerm.getAssociatedCourses()){
+                mTermAssociatedCourses.add(repo.getCourseById(i));
+            }
+        }
+        final CourseAdaptor adaptor = new CourseAdaptor(this);;
+        termDetailRecyclerView.setAdapter(adaptor);
+        termDetailRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adaptor.setCourses(mTermAssociatedCourses);
+    }
+
+    public void updateRecyclerView(){
 
     }
 }

@@ -63,4 +63,8 @@ public class Term {
     public void setTermCourses(List<Integer> termCourses) {
         this.associatedCourses = associatedCourses;
     }
+
+    public String toString(){
+        return termId + ": " + termName;
+    }
 }

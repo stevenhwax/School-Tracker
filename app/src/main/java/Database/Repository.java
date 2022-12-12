@@ -239,4 +239,31 @@ public class Repository {
         }
         return result;
     }
+
+    public Term getTermFromString(String term){
+        for(Term t : mAllTerms){
+            if(t.toString().equals(term)){
+                return t;
+            }
+        }
+        return null;
+    }
+
+    public Course getCourseFromString(String course){
+        for(Course c : mAllCourses){
+            if(c.toString().equals(course)){
+                return c;
+            }
+        }
+        return null;
+    }
+
+    public Assessment getAssessmentFromString(String assessment){
+        for(Assessment a : mAllAssessments){
+            if(a.toString().equals(assessment)){
+                return a;
+            }
+        }
+        return null;
+    }
 }
