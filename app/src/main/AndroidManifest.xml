@@ -29,9 +29,29 @@
         <activity
             android:name=".UI.TermActivity"
             android:parentActivityName=".UI.TermListActivity"
+            android:windowSoftInputMode="adjustNothing"
             android:label="Term Details">
         </activity>
-
+        <activity android:name=".UI.CourseListActivity"
+            android:parentActivityName=".UI.StartActivity"
+            android:label="Course List">
+        </activity>
+        <activity
+            android:name=".UI.CourseActivity"
+            android:parentActivityName=".UI.CourseListActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:label="Course Details">
+        </activity>
+        <activity
+            android:name=".UI.AssessmentListActivity"
+            android:parentActivityName=".UI.StartActivity"
+            android:label="Assessment List">
+        </activity>
+        <activity
+            android:name=".UI.AssessmentActivity"
+            android:parentActivityName=".UI.AssessmentListActivity"
+            android:windowSoftInputMode="adjustNothing"
+            android:label="Assessment Details">
+        </activity>
     </application>
-
 </manifest>

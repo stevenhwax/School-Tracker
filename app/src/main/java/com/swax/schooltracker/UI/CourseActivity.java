@@ -1,4 +1,6 @@
 package com.swax.schooltracker.UI;
 
-public class CourseActivity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class CourseActivity extends AppCompatActivity {
 }
