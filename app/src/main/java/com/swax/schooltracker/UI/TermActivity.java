@@ -73,7 +73,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
         TextView termStartTextView = findViewById(R.id.termStartTextView);
         TextView termEndTextView = findViewById(R.id.termEndTextView);
 
-        termNameEditText.setHint(mTerm.getTermName());
+        termNameEditText.setText(mTerm.getTermName());
         termStartTextView.setText(mTerm.getTermStart().format(formatter));
         termEndTextView.setText(mTerm.getTermEnd().format(formatter));
 
@@ -92,7 +92,6 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
         });
 
         startDate=new DatePickerDialog.OnDateSetListener(){
-
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
                 myCalendar.set(Calendar.YEAR,year);
@@ -189,6 +188,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
+        Intent intent = new Intent(TermActivity.this, TermListActivity.class);
         switch(item.getItemId()){
             case android.R.id.home:
                 this.finish();
@@ -204,13 +204,13 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 } else {
                     repo.update(mTerm);
                 }
+                startActivity(intent);
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
                 if(mTerm.getTermId() != null){
                     repo.delete(mTerm);
                 }
-                Intent intent = new Intent(TermActivity.this, TermListActivity.class);
                 startActivity(intent);
                 return true;
         }
