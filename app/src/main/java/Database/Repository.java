@@ -212,9 +212,11 @@ public class Repository {
 
     public List<Integer> getAssociatedTerms(Course course){
         List<Integer> result = new ArrayList<>();
+
         if(mAllTerms==null){
             getAllTerms();
         }
+
         for(Term term : mAllTerms){
             for(Integer c : term.getAssociatedCourses()){
                 if(course.getCourseId() == c){
