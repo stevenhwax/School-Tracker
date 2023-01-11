@@ -74,6 +74,9 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
             startDate = mAssessment.getAssessmentStart().toLocalDate();
             startHours = mAssessment.getAssessmentStart().getHour();
             startMinutes = mAssessment.getAssessmentStart().getMinute();
+            endDate = mAssessment.getAssessmentEnd().toLocalDate();
+            endHours = mAssessment.getAssessmentEnd().getHour();
+            endMinutes = mAssessment.getAssessmentEnd().getMinute();
         }
 
         assessmentNameEditText = findViewById(R.id.assessmentNameEditText);
@@ -143,7 +146,7 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
             }
         });
 
-        startDatePicker=new DatePickerDialog.OnDateSetListener(){
+        endDatePicker=new DatePickerDialog.OnDateSetListener(){
             @Override
             public void onDateSet(DatePicker datePicker, int year, int monthOfYear, int dayOfMonth) {
                 myCalendar.set(Calendar.YEAR,year);
@@ -282,10 +285,10 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
         if (time.getMinute() < 15){
             pos = 0;
         }
-        if (time.getMinute() > 15 && time.getMinute() < 30){
+        if (time.getMinute() >= 15 && time.getMinute() <= 30){
             pos = 1;
         }
-        if (time.getMinute() > 30 && time.getMinute() < 45){
+        if (time.getMinute() >= 30 && time.getMinute() <= 45){
             pos = 2;
         }
         if (time.getMinute() > 45){
