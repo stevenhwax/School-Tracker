@@ -1,11 +1,13 @@
 package com.swax.schooltracker.UI;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -199,12 +201,14 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 mTerm.setTermStart(mTermStart);
                 mTerm.setTermEnd(mTermEnd);
                 mTerm.setTermCourses(mTermAssociatedCourseIds);
-                if(mTerm.getTermId() == null){
-                    repo.insert(mTerm);
-                } else {
-                    repo.update(mTerm);
+                if(validateFields()){
+                    if(mTerm.getTermId() == null){
+                        repo.insert(mTerm);
+                    } else {
+                        repo.update(mTerm);
+                    }
+                    startActivity(intent);
                 }
-                startActivity(intent);
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
@@ -304,6 +308,29 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
         termDetailRecyclerView.setAdapter(adaptor);
         termDetailRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         adaptor.setCourses(mTermAssociatedCourses);
+    }
+
+    public Boolean validateFields(){
+        Boolean validated = true;
+        String errorMessage = "";
+        if(mTermStart.isAfter(mTermEnd)){
+            validated = false;
+            errorMessage = errorMessage + "Start date is after End date.";
+        }
+        if(!validated) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(TermActivity.this);
+            builder.setTitle("Error Saving")
+                    .setMessage(errorMessage)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //Do nothing
+                        }
+                    })
+                    .create()
+                    .show();
+        }
+        return validated;
     }
 
 }

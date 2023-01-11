@@ -1,6 +1,7 @@
 package com.swax.schooltracker.UI;
 
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -73,8 +74,6 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
     private EditText courseNotesEditText;
     private List<String> courseStatusStrings = Arrays.asList("In Progress", "Completed", "Dropped", "Plan to Take");
 
-    private static int NUMBER_OF_THREADS=4;
-    static final ExecutorService courseExecutor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -337,6 +336,7 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
         }
 
         //Check that the phone number matches expected patterns
+        //Regex care of: https://stackoverflow.com/questions/42104546/java-regular-expressions-to-validate-phone-numbers
         String phoneRegex = "\\d{10}|(?:\\d{3}-){2}\\d{4}|\\(\\d{3}\\)\\d{3}-?\\d{4}";
         if(!mCourse.getInstructorPhone().matches(phoneRegex)){
             validated = false;
@@ -344,6 +344,7 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
         }
 
         //Check that the email matches expected patterns
+        //Regex care of: https://howtodoinjava.com/java/regex/java-regex-validate-email-address/
         String emailRegex = "^[\\w!#$%&amp;'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&amp;'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
         if(!mCourse.getInstructorEmail().matches(emailRegex)){
             validated = false;
@@ -354,6 +355,12 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
             AlertDialog.Builder builder = new AlertDialog.Builder(CourseActivity.this);
             builder.setTitle("Error Saving")
                     .setMessage(errorMessage)
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //Do nothing
+                        }
+                    })
                     .create()
                     .show();
         }

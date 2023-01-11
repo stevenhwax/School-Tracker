@@ -78,7 +78,7 @@
             android:onClick="courseListFABClick"
             app:srcCompat="@android:drawable/ic_input_add"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/termListRecyclerView"/>
+            app:layout_constraintTop_toBottomOf="@+id/courseListRecyclerView"/>
 
     </LinearLayout>
 

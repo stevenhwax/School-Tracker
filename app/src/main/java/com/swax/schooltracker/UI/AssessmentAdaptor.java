@@ -50,7 +50,7 @@ public class AssessmentAdaptor extends RecyclerView.Adapter<AssessmentAdaptor.As
                     } else {
                         int position = getAdapterPosition();
                         final Assessment current = mAssessmentList.get(position);
-                        Intent intent = new Intent(mContext, CourseActivity.class);
+                        Intent intent = new Intent(mContext, AssessmentActivity.class);
                         intent.putExtra("id", current.getAssessmentId());
                         mContext.startActivity(intent);
                     }
