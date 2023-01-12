@@ -173,6 +173,11 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
         ArrayAdapter<String> assessmentTypeAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, assessmentTypeStrings){};
         assessmentTypeSpinner.setAdapter(assessmentTypeAdapter);
         assessmentTypeSpinner.setOnItemSelectedListener(this);
+        if(mAssessment.getAssessmentType().equals("Objective")){
+            assessmentTypeSpinner.setSelection(0);
+        } else {
+            assessmentTypeSpinner.setSelection(1);
+        }
     }
 
     @Override

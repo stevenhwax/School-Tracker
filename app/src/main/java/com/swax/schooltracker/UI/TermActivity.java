@@ -212,10 +212,25 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
-                if(mTerm.getTermId() != null){
-                    repo.delete(mTerm);
+
+                if(!mTerm.getAssociatedCourses().isEmpty()){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(TermActivity.this);
+                    builder.setTitle("Error Deleting")
+                            .setMessage("There are still courses associated with this term.")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //Do nothing
+                                }
+                            })
+                            .create()
+                            .show();
                 }
-                startActivity(intent);
+
+                if(mTerm.getTermId() != null && mTerm.getAssociatedCourses().isEmpty()){
+                    repo.delete(mTerm);
+                    startActivity(intent);
+                }
                 return true;
         }
         return false;
