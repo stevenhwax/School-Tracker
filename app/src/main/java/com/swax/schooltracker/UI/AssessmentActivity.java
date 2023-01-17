@@ -1,6 +1,9 @@
 package com.swax.schooltracker.UI;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +39,7 @@ import java.util.Locale;
 
 import Database.Repository;
 import Entities.Assessment;
+import Recievers.NotificationReciever;
 
 public class AssessmentActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -224,6 +229,14 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
                     mAssessment.setAssessmentStart(startDate.atTime(startHours, startMinutes));
                     mAssessment.setAssessmentEnd(endDate.atTime(endHours, endMinutes));
                 if (validateFields()){
+                    String startMessage = mAssessment.getAssessmentName() + " is starting at " + mAssessment.getAssessmentStart().format(formatter);
+                    ZoneId zoneId = ZoneId.systemDefault();
+                    ZoneOffset offset = zoneId.getRules().getOffset(mAssessment.getAssessmentStart());
+                    Long startTime = mAssessment.getAssessmentStart().toEpochSecond(offset);
+                    setNotification(startTime, startMessage, mAssessment.getAssessmentId() + 50000);
+                    String endMessage = mAssessment.getAssessmentName() + " is ending at " + mAssessment.getAssessmentEnd().format(formatter);
+                    Long endTime = mAssessment.getAssessmentEnd().toEpochSecond(offset);
+                    setNotification(endTime, endMessage, mAssessment.getAssessmentId() + 500000);
                     if (mAssessment.getAssessmentId() != null){
                         repo.update(mAssessment);
                     } else {
@@ -234,6 +247,8 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
+                deleteNotification(mAssessment.getAssessmentId() + 50000);
+                deleteNotification(mAssessment.getAssessmentId() + 500000);
                 if(mAssessment.getAssessmentId() != null){
                     repo.delete(mAssessment);
                 }
@@ -300,5 +315,20 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
             pos = 3;
         }
         return pos;
+    }
+
+    public void setNotification(Long trigger, String message, Integer id){
+        Intent intent = new Intent(AssessmentActivity.this, NotificationReciever.class);
+        intent.putExtra("message", message);
+        PendingIntent sender = PendingIntent.getBroadcast(AssessmentActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+    }
+
+    public void deleteNotification(Integer id){
+        Intent intent = new Intent(AssessmentActivity.this, NotificationReciever.class);
+        PendingIntent sender = PendingIntent.getBroadcast(AssessmentActivity.this, id,  intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        am.cancel(sender);
     }
 }

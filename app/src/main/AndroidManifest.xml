@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.swax.schooltracker">
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,6 +12,16 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SchoolTracker"
         tools:targetApi="31">
+        <receiver
+            android:name="Recievers.NotificationReciever"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.media.action.DISPLAY_NOTIFICATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".UI.StartActivity"
             android:exported="true">
@@ -23,35 +32,31 @@
         </activity>
         <activity
             android:name=".UI.TermListActivity"
-            android:parentActivityName=".UI.StartActivity"
-            android:label="Term List">
-        </activity>
+            android:label="Term List"
+            android:parentActivityName=".UI.StartActivity"></activity>
         <activity
             android:name=".UI.TermActivity"
+            android:label="Term Details"
             android:parentActivityName=".UI.TermListActivity"
-            android:windowSoftInputMode="adjustNothing"
-            android:label="Term Details">
-        </activity>
-        <activity android:name=".UI.CourseListActivity"
-            android:parentActivityName=".UI.StartActivity"
-            android:label="Course List">
-        </activity>
+            android:windowSoftInputMode="adjustNothing"></activity>
+        <activity
+            android:name=".UI.CourseListActivity"
+            android:label="Course List"
+            android:parentActivityName=".UI.StartActivity"></activity>
         <activity
             android:name=".UI.CourseActivity"
+            android:label="Course Details"
             android:parentActivityName=".UI.CourseListActivity"
-            android:windowSoftInputMode="adjustNothing"
-            android:label="Course Details">
-        </activity>
+            android:windowSoftInputMode="adjustNothing"></activity>
         <activity
             android:name=".UI.AssessmentListActivity"
-            android:parentActivityName=".UI.StartActivity"
-            android:label="Assessment List">
-        </activity>
+            android:label="Assessment List"
+            android:parentActivityName=".UI.StartActivity"></activity>
         <activity
             android:name=".UI.AssessmentActivity"
+            android:label="Assessment Details"
             android:parentActivityName=".UI.AssessmentListActivity"
-            android:windowSoftInputMode="adjustNothing"
-            android:label="Assessment Details">
-        </activity>
+            android:windowSoftInputMode="adjustNothing"></activity>
     </application>
+
 </manifest>

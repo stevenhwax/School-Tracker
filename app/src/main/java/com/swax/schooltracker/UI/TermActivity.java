@@ -6,7 +6,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -39,6 +42,7 @@ import java.util.Locale;
 import Database.Repository;
 import Entities.Course;
 import Entities.Term;
+import Recievers.NotificationReciever;
 
 public class TermActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -202,6 +206,15 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 mTerm.setTermEnd(mTermEnd);
                 mTerm.setTermCourses(mTermAssociatedCourseIds);
                 if(validateFields()){
+                    /*
+                    String startMessage = "Term " + mTerm.getTermName() + " is starting at " + mTerm.getTermStart().format(formatter);
+                    ZoneId zoneId = ZoneId.systemDefault();
+                    Long startTime = mTerm.getTermStart().atStartOfDay(zoneId).toEpochSecond();
+                    setNotification(startTime, startMessage);
+                    String endMessage = "Term " + mTerm.getTermName() + " is ending at " + mTerm.getTermEnd().format(formatter);
+                    Long endTime = mTerm.getTermEnd().atStartOfDay(zoneId).toEpochSecond();
+                    setNotification(endTime, endMessage);
+                     */
                     if(mTerm.getTermId() == null){
                         repo.insert(mTerm);
                     } else {
@@ -316,7 +329,13 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
         RecyclerView termDetailRecyclerView = findViewById(R.id.termDetailRecyclerView);
         if(mTermAssociatedCourses.isEmpty()){
             for(Integer i : mTerm.getAssociatedCourses()){
-                mTermAssociatedCourses.add(repo.getCourseById(i));
+                if(repo.getCourseById(i) != null){
+                    mTermAssociatedCourses.add(repo.getCourseById(i));
+                } else {
+                    List<Integer> courseIds = mTerm.getAssociatedCourses();
+                    courseIds.remove(i);
+                    mTerm.setTermCourses(courseIds);
+                }
             }
         }
         final CourseAdaptor adaptor = new CourseAdaptor(this);;
@@ -346,6 +365,14 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                     .show();
         }
         return validated;
+    }
+
+    public void setNotification(Long trigger, String message){
+        Intent intent = new Intent(TermActivity.this, NotificationReciever.class);
+        intent.putExtra("message", message);
+        PendingIntent sender = PendingIntent.getBroadcast(TermActivity.this, mTerm.getTermId(), intent, PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, trigger, sender);
     }
 
 }

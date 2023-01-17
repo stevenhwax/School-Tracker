@@ -26,7 +26,7 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         Repository repo = new Repository(getApplication());
-        if(repo.getAssessmentById(1) == null) {
+        if(repo.getAllTerms().isEmpty()) {
             //Create test data
             LocalDate startDate = LocalDate.of(2022, 12, 10);
             LocalDate endDate = LocalDate.of(2022, 12, 25);
@@ -35,10 +35,10 @@ public class StartActivity extends AppCompatActivity {
             Assessment ass2 = new Assessment("assessment2", startDate.atStartOfDay(), endDate.atStartOfDay(), "tetytest");
             Assessment ass3 = new Assessment("assessment3", startDate.atStartOfDay(), endDate.atStartOfDay(), "tetytest");
             Assessment ass4 = new Assessment("assessment4", startDate.atStartOfDay(), endDate.atStartOfDay(), "tetytest");
-            Course course1 = new Course("course1", startDate, endDate, "status", "teacher", "5551212", "teach@teacher.com", null, associated);
-            Course course2 = new Course("course2", startDate, endDate, "status", "teacher", "5551212", "teach@teacher.com", null, associated);
-            Course course3 = new Course("course3", startDate, endDate, "status", "teacher", "5551212", "teach@teacher.com", null, associated);
-            Course course4 = new Course("course4", startDate, endDate, "status", "teacher", "5551212", "teach@teacher.com", null, associated);
+            Course course1 = new Course("course1", startDate, endDate, "status", "teacher", "2065551212", "teach@teacher.com", "notes", associated);
+            Course course2 = new Course("course2", startDate, endDate, "status", "teacher", "2065551212", "teach@teacher.com", "notes", associated);
+            Course course3 = new Course("course3", startDate, endDate, "status", "teacher", "2065551212", "teach@teacher.com", "notes", associated);
+            Course course4 = new Course("course4", startDate, endDate, "status", "teacher", "2065551212", "teach@teacher.com", "notes", associated);
             Term term1 = new Term("term1", startDate, endDate, associated);
             Term term2 = new Term("term2", startDate, endDate, associated);
             Term term3 = new Term("term3", startDate, endDate, associated);

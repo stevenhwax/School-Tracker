@@ -1,6 +1,9 @@
 package com.swax.schooltracker.UI;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -43,6 +46,7 @@ import Database.Repository;
 import Entities.Assessment;
 import Entities.Course;
 import Entities.Term;
+import Recievers.NotificationReciever;
 
 public class CourseActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
 
@@ -60,7 +64,7 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
     private List<Assessment> associatedAssessments = new ArrayList<>();
     private List<String> courseAddAssessmentStrings;
     private List<String> courseDeleteAssessmentStrings;
-    private Repository repo = new Repository(getApplication());
+    private Repository repo;
     private DatePickerDialog.OnDateSetListener startDate;
     private DatePickerDialog.OnDateSetListener endDate;
     private final Calendar myCalendar = Calendar.getInstance();
@@ -79,6 +83,9 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_course_detail);
+
+        repo = new Repository(getApplication());
+
         if(getIntent().getIntExtra("id", 0) == 0){
             mCourse = new Course(mCourseName, mCourseStart, mCourseEnd, mCourseStatus, mCourseInstructor, mCoursePhone, mCourseEmail, mCourseNotes, associatedAssessmentIds);
         } else {
@@ -220,6 +227,15 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
                 mCourse.setInstructorEmail(courseEmailEditText.getText().toString());
                 mCourse.setCourseNotes(courseNotesEditText.getText().toString());
                 if (validateFields()){
+                    //deleteNotification(mCourse.getCourseId());
+                    //deleteNotification(mCourse.getCourseId() + 100000);
+                    String startMessage = mCourse.getCourseName() + " is starting at " + mCourse.getCourseStart().format(formatter);
+                    ZoneId zoneId = ZoneId.systemDefault();
+                    Long startTime = mCourse.getCourseStart().atStartOfDay(zoneId).toInstant().toEpochMilli();
+                    setNotification(startTime, startMessage, mCourse.getCourseId());
+                    String endMessage = mCourse.getCourseName() + " is ending at " + mCourse.getCourseEnd().format(formatter);
+                    Long endTime = mCourse.getCourseEnd().atStartOfDay(zoneId).toInstant().toEpochMilli();
+                    setNotification(endTime, endMessage, mCourse.getCourseId() + 100000);
                     if (mCourse.getCourseId() != null){
                         repo.update(mCourse);
                     } else {
@@ -230,10 +246,35 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
-                if(mCourse.getCourseId() != null){
+                if(!mCourse.getAssociatedAssessments().isEmpty()){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(CourseActivity.this);
+                    builder.setTitle("Error Deleting")
+                            .setMessage("There are still assessments associated with this course.")
+                            .setCancelable(false)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    //Do nothing
+                                }
+                            })
+                            .create()
+                            .show();
+                }
+                if(mCourse.getCourseId() != null && mCourse.getAssociatedAssessments().isEmpty()){
+                    deleteNotification(mCourse.getCourseId());
+                    deleteNotification(mCourse.getCourseId() + 100000);
                     repo.delete(mCourse);
                 }
                 startActivity(intent);
+                return true;
+            case R.id.share:
+                String message = "Course Name: " + mCourse.getCourseName() + "\n Course Notes: " + mCourse.getCourseNotes();
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_TITLE, "Course Notes from SchoolTracker");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, message);
+                shareIntent.setType("text/plain");
+                Intent sendIntent = Intent.createChooser(shareIntent, null);
+                startActivity(sendIntent);
                 return true;
         }
         return false;
@@ -245,7 +286,11 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
             //Find our associated assessments
             associatedAssessmentIds = mCourse.getAssociatedAssessments();
             for (Integer i : associatedAssessmentIds) {
-                associatedAssessments.add(repo.getAssessmentById(i));
+                if(repo.getAssessmentById(i) != null){
+                    associatedAssessments.add(repo.getAssessmentById(i));
+                } else {
+                    associatedAssessmentIds.remove(i);
+                }
             }
         }
 
@@ -366,6 +411,21 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
         }
 
         return validated;
+    }
+
+    public void setNotification(Long trigger, String message, Integer id){
+        Intent intent = new Intent(CourseActivity.this, NotificationReciever.class);
+        intent.putExtra("message", message);
+        PendingIntent sender = PendingIntent.getBroadcast(CourseActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        am.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+    }
+
+    public void deleteNotification(Integer id){
+        Intent intent = new Intent(CourseActivity.this, NotificationReciever.class);
+        PendingIntent sender = PendingIntent.getBroadcast(CourseActivity.this, id,  intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        am.cancel(sender);
     }
 
 }
