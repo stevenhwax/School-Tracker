@@ -16,151 +16,165 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:orientation="horizontal">
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.3"
-                    android:text="Term Name:" />
+                    android:layout_marginHorizontal="20dp"
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/termNameEditText"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:text="Term Name:" />
+
+                    <EditText
+                        android:id="@+id/termNameEditText"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.7" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.7" />
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginVertical="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="20dp"
+                        android:layout_weight="0.3"
+                        android:text="Start Date:" />
+
+                    <TextView
+                        android:id="@+id/termStartTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="20dp"
+                        android:layout_weight="0.7" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginVertical="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.3"
+                        android:text="End Date:" />
+
+                    <TextView
+                        android:id="@+id/termEndTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.7" />
+                </LinearLayout>
+
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="350dp"
                 android:layout_marginHorizontal="20dp"
-                android:layout_marginVertical="5dp"
-                android:orientation="horizontal">
+                android:layout_marginBottom="100dp"
+                android:orientation="vertical"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.3"
-                    android:text="Start Date:" />
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:padding="5dp"
+                    android:text="Associated Courses" />
 
-                <TextView
-                    android:id="@+id/termStartTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.7" />
+                <LinearLayout
+                    android:id="@+id/termListHeaderRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.1"
+                        android:paddingLeft="10dp"
+                        android:text="ID"
+                        android:background="@drawable/background"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.4"
+                        android:paddingLeft="10dp"
+                        android:text="Name"
+                        android:background="@drawable/background"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.25"
+                        android:paddingLeft="10dp"
+                        android:text="Start Date"
+                        android:background="@drawable/background"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.25"
+                        android:paddingLeft="10dp"
+                        android:text="End Date"
+                        android:background="@drawable/background"/>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/termDetailRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:background="@drawable/background">
+                </androidx.recyclerview.widget.RecyclerView>
+
             </LinearLayout>
+
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginVertical="5dp"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.3"
-                    android:text="End Date:" />
 
-                <TextView
-                    android:id="@+id/termEndTextView"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.7" />
+                <Spinner
+                    android:id="@+id/termDetailAddCourseSpinner"
+                    android:layout_width="180dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="20dp"
+                    android:spinnerMode="dropdown"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent" />
+
+                <Spinner
+                    android:id="@+id/termDetailDeleteCourseSpinner"
+                    android:layout_width="180dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="20dp"
+                    android:spinnerMode="dropdown"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintRight_toRightOf="parent" />
+
             </LinearLayout>
 
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="100dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:padding="5dp"
-                android:text="Associated Courses" />
-
-            <LinearLayout
-                android:id="@+id/termListHeaderRow"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
-                    android:paddingLeft="10dp"
-                    android:text="ID"
-                    android:background="@drawable/background"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.4"
-                    android:paddingLeft="10dp"
-                    android:text="Name"
-                    android:background="@drawable/background"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.25"
-                    android:paddingLeft="10dp"
-                    android:text="Start Date"
-                    android:background="@drawable/background"/>
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.25"
-                    android:paddingLeft="10dp"
-                    android:text="End Date"
-                    android:background="@drawable/background"/>
-
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/termDetailRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:background="@drawable/background">
-            </androidx.recyclerview.widget.RecyclerView>
-
-        </LinearLayout>
-
-
-
-        <Spinner
-            android:id="@+id/termDetailAddCourseSpinner"
-            android:layout_width="180dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginLeft="20dp"
-            android:spinnerMode="dropdown"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent" />
-
-        <Spinner
-            android:id="@+id/termDetailDeleteCourseSpinner"
-            android:layout_width="180dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="20dp"
-            android:layout_marginRight="20dp"
-            android:spinnerMode="dropdown"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent" />
 
     </ScrollView>
 
