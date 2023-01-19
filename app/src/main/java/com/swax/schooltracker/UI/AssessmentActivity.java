@@ -61,9 +61,11 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
     private List<String> hourOptions;
     private List<String> minuteOptions;
     private final Calendar myCalendar = Calendar.getInstance();
-    private String myFormat = "MM/dd/yyyy";
-    private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
-    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern(myFormat);
+    private String myDateFormat = "MM/dd/yyyy";
+    private SimpleDateFormat sdf = new SimpleDateFormat(myDateFormat, Locale.US);
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(myDateFormat);
+    private String myDateTimeFormat = "MM/dd/yyyy HH:mm";
+    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(myDateTimeFormat);
     private EditText assessmentNameEditText;
     private TextView assessmentStartTextView;
 
@@ -76,19 +78,20 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
             mAssessment = new Assessment(mAssessmentName, roundMinutes(assessmentTime), roundMinutes(assessmentTime), mAssessmentType);
         } else {
             mAssessment = repo.getAssessmentById(getIntent().getIntExtra("id", 0));
-            startDate = mAssessment.getAssessmentStart().toLocalDate();
-            startHours = mAssessment.getAssessmentStart().getHour();
-            startMinutes = mAssessment.getAssessmentStart().getMinute();
-            endDate = mAssessment.getAssessmentEnd().toLocalDate();
-            endHours = mAssessment.getAssessmentEnd().getHour();
-            endMinutes = mAssessment.getAssessmentEnd().getMinute();
         }
+
+        startDate = mAssessment.getAssessmentStart().toLocalDate();
+        startHours = mAssessment.getAssessmentStart().getHour();
+        startMinutes = mAssessment.getAssessmentStart().getMinute();
+        endDate = mAssessment.getAssessmentEnd().toLocalDate();
+        endHours = mAssessment.getAssessmentEnd().getHour();
+        endMinutes = mAssessment.getAssessmentEnd().getMinute();
 
         assessmentNameEditText = findViewById(R.id.assessmentNameEditText);
         assessmentNameEditText.setText(mAssessment.getAssessmentName());
 
         assessmentStartTextView = findViewById(R.id.assessmentStartTextView);
-        assessmentStartTextView.setText(mAssessment.getAssessmentStart().format(formatter));
+        assessmentStartTextView.setText(mAssessment.getAssessmentStart().format(dateFormatter));
 
         assessmentStartTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +138,7 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
         assessmentStartMinutesSpinner.setSelection(getSpinnerPosition(mAssessment.getAssessmentStart()));
 
         TextView assessmentEndTextView = findViewById(R.id.assessmentEndTextView);
-        assessmentEndTextView.setText(mAssessment.getAssessmentEnd().format(formatter));
+        assessmentEndTextView.setText(mAssessment.getAssessmentEnd().format(dateFormatter));
 
         assessmentEndTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -229,17 +232,19 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
                     mAssessment.setAssessmentStart(startDate.atTime(startHours, startMinutes));
                     mAssessment.setAssessmentEnd(endDate.atTime(endHours, endMinutes));
                 if (validateFields()){
-                    String startMessage = mAssessment.getAssessmentName() + " is starting at " + mAssessment.getAssessmentStart().format(formatter);
+                    String startMessage = mAssessment.getAssessmentName() + " is starting at " + mAssessment.getAssessmentStart().format(dateTimeFormatter);
                     ZoneId zoneId = ZoneId.systemDefault();
                     ZoneOffset offset = zoneId.getRules().getOffset(mAssessment.getAssessmentStart());
-                    Long startTime = mAssessment.getAssessmentStart().toEpochSecond(offset);
-                    setNotification(startTime, startMessage, mAssessment.getAssessmentId() + 50000);
-                    String endMessage = mAssessment.getAssessmentName() + " is ending at " + mAssessment.getAssessmentEnd().format(formatter);
-                    Long endTime = mAssessment.getAssessmentEnd().toEpochSecond(offset);
-                    setNotification(endTime, endMessage, mAssessment.getAssessmentId() + 500000);
+                    Long startTime = mAssessment.getAssessmentStart().toInstant(offset).toEpochMilli();
+                    String endMessage = mAssessment.getAssessmentName() + " is ending at " + mAssessment.getAssessmentEnd().format(dateTimeFormatter);
+                    Long endTime = mAssessment.getAssessmentEnd().toInstant(offset).toEpochMilli();
                     if (mAssessment.getAssessmentId() != null){
+                        setNotification(startTime, startMessage, mAssessment.getAssessmentId() + 50000);
+                        setNotification(endTime, endMessage, mAssessment.getAssessmentId() + 500000);
                         repo.update(mAssessment);
                     } else {
+                        setNotification(startTime, startMessage, repo.getMaxAssessmentId() + 50001);
+                        setNotification(endTime, endMessage, repo.getMaxAssessmentId() + 500001);
                         repo.insert(mAssessment);
                     }
                     startActivity(intent);
@@ -247,9 +252,9 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
                 return true;
             case R.id.delete:
                 Log.d(LOG_ID, "You clicked delete!");
-                deleteNotification(mAssessment.getAssessmentId() + 50000);
-                deleteNotification(mAssessment.getAssessmentId() + 500000);
                 if(mAssessment.getAssessmentId() != null){
+                    deleteNotification(mAssessment.getAssessmentId() + 50000);
+                    deleteNotification(mAssessment.getAssessmentId() + 500000);
                     repo.delete(mAssessment);
                 }
                 startActivity(intent);
@@ -305,13 +310,13 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
         if (time.getMinute() < 15){
             pos = 0;
         }
-        if (time.getMinute() >= 15 && time.getMinute() <= 30){
+        if (time.getMinute() >= 15 && time.getMinute() < 30){
             pos = 1;
         }
-        if (time.getMinute() >= 30 && time.getMinute() <= 45){
+        if (time.getMinute() >= 30 && time.getMinute() < 45){
             pos = 2;
         }
-        if (time.getMinute() > 45){
+        if (time.getMinute() >= 45){
             pos = 3;
         }
         return pos;
@@ -322,7 +327,7 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
         intent.putExtra("message", message);
         PendingIntent sender = PendingIntent.getBroadcast(AssessmentActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, sender);
     }
 
     public void deleteNotification(Integer id){

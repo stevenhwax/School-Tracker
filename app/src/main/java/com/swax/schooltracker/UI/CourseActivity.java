@@ -227,18 +227,18 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
                 mCourse.setInstructorEmail(courseEmailEditText.getText().toString());
                 mCourse.setCourseNotes(courseNotesEditText.getText().toString());
                 if (validateFields()){
-                    //deleteNotification(mCourse.getCourseId());
-                    //deleteNotification(mCourse.getCourseId() + 100000);
                     String startMessage = mCourse.getCourseName() + " is starting at " + mCourse.getCourseStart().format(formatter);
                     ZoneId zoneId = ZoneId.systemDefault();
                     Long startTime = mCourse.getCourseStart().atStartOfDay(zoneId).toInstant().toEpochMilli();
-                    setNotification(startTime, startMessage, mCourse.getCourseId());
                     String endMessage = mCourse.getCourseName() + " is ending at " + mCourse.getCourseEnd().format(formatter);
                     Long endTime = mCourse.getCourseEnd().atStartOfDay(zoneId).toInstant().toEpochMilli();
-                    setNotification(endTime, endMessage, mCourse.getCourseId() + 100000);
                     if (mCourse.getCourseId() != null){
+                        setNotification(startTime, startMessage, mCourse.getCourseId());
+                        setNotification(endTime, endMessage, mCourse.getCourseId() + 100000);
                         repo.update(mCourse);
                     } else {
+                        setNotification(startTime, startMessage, repo.getMaxCourseId() + 1);
+                        setNotification(endTime, endMessage, repo.getMaxCourseId() + 100001);
                         repo.insert(mCourse);
                     }
                     startActivity(intent);
@@ -263,11 +263,11 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
                     deleteNotification(mCourse.getCourseId());
                     deleteNotification(mCourse.getCourseId() + 100000);
                     repo.delete(mCourse);
+                    startActivity(intent);
                 }
-                startActivity(intent);
                 return true;
             case R.id.share:
-                String message = "Course Name: " + mCourse.getCourseName() + "\n Course Notes: " + mCourse.getCourseNotes();
+                String message = "Course Name: " + mCourse.getCourseName() + " Course Notes: " + mCourse.getCourseNotes();
                 Intent shareIntent = new Intent();
                 shareIntent.setAction(Intent.ACTION_SEND);
                 shareIntent.putExtra(Intent.EXTRA_TITLE, "Course Notes from SchoolTracker");
@@ -418,7 +418,7 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
         intent.putExtra("message", message);
         PendingIntent sender = PendingIntent.getBroadcast(CourseActivity.this, id, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, trigger, sender);
+        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, sender);
     }
 
     public void deleteNotification(Integer id){

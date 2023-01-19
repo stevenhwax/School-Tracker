@@ -252,6 +252,9 @@ public class Repository {
     }
 
     public Course getCourseFromString(String course){
+        if(mAllCourses == null){
+            getAllCourses();
+        }
         for(Course c : mAllCourses){
             if(c.toString().equals(course)){
                 return c;
@@ -261,6 +264,9 @@ public class Repository {
     }
 
     public Assessment getAssessmentFromString(String assessment){
+        if(mAllAssessments == null){
+            getAllAssessments();
+        }
         for(Assessment a : mAllAssessments){
             if(a.toString().equals(assessment)){
                 return a;
@@ -268,4 +274,21 @@ public class Repository {
         }
         return null;
     }
+
+    public Integer getMaxCourseId(){
+        if(mAllCourses == null){
+            getAllCourses();
+        }
+        Course lastCourse = mAllCourses.get(mAllCourses.size() - 1);
+        return lastCourse.getCourseId();
+    }
+
+    public Integer getMaxAssessmentId(){
+        if(mAllAssessments == null){
+            getAllAssessments();
+        }
+        Assessment lastAssessment = mAllAssessments.get(mAllAssessments.size() - 1);
+        return lastAssessment.getAssessmentId();
+    }
+
 }
