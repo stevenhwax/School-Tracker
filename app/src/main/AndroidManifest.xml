@@ -57,6 +57,21 @@
             android:label="Assessment Details"
             android:parentActivityName=".UI.AssessmentListActivity"
             android:windowSoftInputMode="adjustNothing"></activity>
+        <activity
+            android:name=".UI.ReportListActivity"
+            android:label="Reports"
+            android:parentActivityName=".UI.StartActivity"
+            android:windowSoftInputMode="adjustNothing"></activity>
+        <activity
+            android:name=".UI.ReportCbsActivity"
+            android:label="Report: Course By Status"
+            android:parentActivityName=".UI.ReportListActivity"
+            android:windowSoftInputMode="adjustNothing"></activity>
+        <activity
+            android:name=".UI.ReportAbtActivity"
+            android:label="Report: Assessment By Type"
+            android:parentActivityName=".UI.ReportListActivity"
+            android:windowSoftInputMode="adjustNothing"></activity>
     </application>
 
 </manifest>

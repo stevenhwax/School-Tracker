@@ -20,9 +20,6 @@
                 android:layout_width="290dp"
                 android:layout_height="61dp"
                 android:text="Terms List"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginTop="250dp"
                 android:layout_gravity="center"
                 android:onClick="termListButtonOnClick"/>
@@ -32,9 +29,6 @@
                 android:layout_width="290dp"
                 android:layout_height="61dp"
                 android:text="Course List"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/termListButton"
-                app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginTop="20dp"
                 android:layout_gravity="center"
                 android:onClick="courseListButtonOnClick"/>
@@ -44,12 +38,17 @@
                 android:layout_width="290dp"
                 android:layout_height="61dp"
                 android:text="Assessment List"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/courseListButton"
-                app:layout_constraintRight_toRightOf="parent"
                 android:layout_marginTop="20dp"
                 android:layout_gravity="center"
                 android:onClick="assessmentListButtonOnClick"/>
+
+            <Button
+                android:layout_width="290dp"
+                android:layout_height="61dp"
+                android:text="Reports"
+                android:layout_marginTop="20dp"
+                android:layout_gravity="center"
+                android:onClick="reportsListButtonOnClick"/>
 
         </LinearLayout>
 

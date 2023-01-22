@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:text="Assessment by Type"
+                    android:textSize="20dp"/>
+
+                <TextView
+                    android:id="@+id/reportAbtDateTextView"
+                    android:layout_width="125dp"
+                    android:layout_margin="20dp"
+                    android:layout_height="wrap_content"
+                    android:text="XX/XX/XXXX"
+                    android:textSize="20dp"/>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginVertical="10dp"
+                    android:text="Objective:"/>
+
+                <TextView
+                    android:id='@+id/objectiveCountTextView'
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"                    android:layout_marginLeft="20dp"
+                    android:layout_marginVertical="10dp"
+                    android:text="XX"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginVertical="10dp"
+                    android:text="Performance:"/>
+
+                <TextView
+                    android:id='@+id/performanceCountTextView'
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"                    android:layout_marginLeft="20dp"
+                    android:layout_marginVertical="10dp"
+                    android:text="XX"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
