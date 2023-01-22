@@ -4,11 +4,14 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.swax.schooltracker.R;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import Database.Repository;
@@ -16,8 +19,8 @@ import Entities.Assessment;
 
 public class ReportAbtActivity extends AppCompatActivity {
 
-    private Integer objectiveCount = 0;
-    private Integer performanceCount = 0;
+    private List<Assessment> objectiveCount = new ArrayList<>();
+    private List<Assessment> performanceCount = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,23 +31,27 @@ public class ReportAbtActivity extends AppCompatActivity {
         for(Assessment a : assessments){
             switch(a.getAssessmentType()){
                 case "Objective":
-                    objectiveCount++;
+                    objectiveCount.add(a);
                     break;
                 case "Performance":
-                    performanceCount++;
+                    performanceCount.add(a);
                     break;
             }
         }
+        List<Assessment> sorted = new ArrayList<>();
+        sorted.addAll(objectiveCount);
+        sorted.addAll(performanceCount);
+
         TextView reportAbtDateTextView = findViewById(R.id.reportAbtDateTextView);
         String myFormat = "MM/dd/yyyy";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(myFormat);
         reportAbtDateTextView.setText(LocalDate.now().format(formatter));
 
-        TextView objectiveCountTextView = findViewById(R.id.objectiveCountTextView);
-        objectiveCountTextView.setText(objectiveCount.toString());
-
-        TextView performanceCountTextView = findViewById(R.id.performanceCountTextView);
-        performanceCountTextView.setText(performanceCount.toString());
+        RecyclerView reportAbtRecyclerView = findViewById(R.id.reportAbtRecyclerView);
+        final ReportAbtAdaptor adapter = new ReportAbtAdaptor(this);
+        reportAbtRecyclerView.setAdapter(adapter);
+        reportAbtRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter.setAssessments(sorted);
     }
 }
 

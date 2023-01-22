@@ -25,8 +25,6 @@ public class TermAdaptor extends RecyclerView.Adapter<TermAdaptor.TermViewHolder
     private List<Term> mTermList;
     private final Context mContext;
     private final LayoutInflater mInflater;
-    private String myFormat = "MM/dd/yyyy";
-    private SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
 
     public TermAdaptor(Context context){

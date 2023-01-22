@@ -38,44 +38,52 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="20dp">
 
                 <TextView
-                    android:layout_width="150dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginVertical="10dp"
-                    android:text="Objective:"/>
+                    android:layout_weight="0.05"
+                    android:background="@drawable/background"
+                    android:text="Id"/>
 
                 <TextView
-                    android:id='@+id/objectiveCountTextView'
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"                    android:layout_marginLeft="20dp"
-                    android:layout_marginVertical="10dp"
-                    android:text="XX"/>
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/background"
+                    android:text="Name"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/background"
+                    android:text="Status"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.225"
+                    android:background="@drawable/background"
+                    android:text="Start Date"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.225"
+                    android:background="@drawable/background"
+                    android:text="End Date"/>
 
             </LinearLayout>
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reportAbtRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginVertical="10dp"
-                    android:text="Performance:"/>
-
-                <TextView
-                    android:id='@+id/performanceCountTextView'
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"                    android:layout_marginLeft="20dp"
-                    android:layout_marginVertical="10dp"
-                    android:text="XX"/>
-
-            </LinearLayout>
+                android:layout_height="250dp"
+                android:layout_marginHorizontal="20dp"
+                ></androidx.recyclerview.widget.RecyclerView>
 
         </LinearLayout>
 

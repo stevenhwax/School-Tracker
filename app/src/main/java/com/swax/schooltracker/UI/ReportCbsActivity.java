@@ -4,24 +4,29 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.swax.schooltracker.R;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import Database.Repository;
 import Entities.Course;
 
 public class ReportCbsActivity extends AppCompatActivity {
 
-    private Integer inProcessCount = 0;
-    private Integer completedCount = 0;
-    private Integer droppedCount = 0;
-    private Integer planToTakeCount = 0;
+    private List<Course> inProcessCount = new ArrayList<>();
+    private List<Course> completedCount = new ArrayList<>();
+    private List<Course> droppedCount = new ArrayList<>();
+    private List<Course> planToTakeCount = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,34 +37,34 @@ public class ReportCbsActivity extends AppCompatActivity {
         for(Course c : courses){
             switch(c.getCourseStatus()){
                 case "In Process":
-                    inProcessCount++;
+                    inProcessCount.add(c);
                     break;
                 case "Completed":
-                    completedCount++;
+                    completedCount.add(c);
                     break;
                 case "Dropped":
-                    droppedCount++;
+                    droppedCount.add(c);
                     break;
                 case "Plan to Take":
-                    planToTakeCount++;
+                    planToTakeCount.add(c);
                     break;
             }
         }
+        List<Course> sorted = new ArrayList<>();
+        sorted.addAll(inProcessCount);
+        sorted.addAll(completedCount);
+        sorted.addAll(droppedCount);
+        sorted.addAll(planToTakeCount);
+
         TextView reportCbsDateTextView = findViewById(R.id.reportCbsDateTextView);
         String myFormat = "MM/dd/yyyy";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(myFormat);
         reportCbsDateTextView.setText(LocalDate.now().format(formatter));
 
-        TextView inProcessCountTextView = findViewById(R.id.inProcessCountTextView);
-        inProcessCountTextView.setText(inProcessCount.toString());
-
-        TextView completedCountTextView = findViewById(R.id.completedCountTextView);
-        completedCountTextView.setText(completedCount.toString());
-
-        TextView droppedCountTextView = findViewById(R.id.droppedCountTextView);
-        droppedCountTextView.setText(droppedCount.toString());
-
-        TextView planToTakeCountTextView = findViewById(R.id.planToTakeCountTextView);
-        planToTakeCountTextView.setText(planToTakeCount.toString());
+        RecyclerView reportCbsRecyclerView = findViewById(R.id.reportCbsRecyclerView);
+        final ReportCbsAdaptor adapter = new ReportCbsAdaptor(this);
+        reportCbsRecyclerView.setAdapter(adapter);
+        reportCbsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter.setCourses(sorted);
     }
 }
