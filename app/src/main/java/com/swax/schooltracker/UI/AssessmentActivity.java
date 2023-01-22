@@ -216,7 +216,7 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
 
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_term, menu);
+        getMenuInflater().inflate(R.menu.menu_assessment, menu);
         return true;
     }
 
@@ -232,19 +232,9 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
                     mAssessment.setAssessmentStart(startDate.atTime(startHours, startMinutes));
                     mAssessment.setAssessmentEnd(endDate.atTime(endHours, endMinutes));
                 if (validateFields()){
-                    String startMessage = mAssessment.getAssessmentName() + " is starting at " + mAssessment.getAssessmentStart().format(dateTimeFormatter);
-                    ZoneId zoneId = ZoneId.systemDefault();
-                    ZoneOffset offset = zoneId.getRules().getOffset(mAssessment.getAssessmentStart());
-                    Long startTime = mAssessment.getAssessmentStart().toInstant(offset).toEpochMilli();
-                    String endMessage = mAssessment.getAssessmentName() + " is ending at " + mAssessment.getAssessmentEnd().format(dateTimeFormatter);
-                    Long endTime = mAssessment.getAssessmentEnd().toInstant(offset).toEpochMilli();
                     if (mAssessment.getAssessmentId() != null){
-                        setNotification(startTime, startMessage, mAssessment.getAssessmentId() + 50000);
-                        setNotification(endTime, endMessage, mAssessment.getAssessmentId() + 500000);
                         repo.update(mAssessment);
                     } else {
-                        setNotification(startTime, startMessage, repo.getMaxAssessmentId() + 50001);
-                        setNotification(endTime, endMessage, repo.getMaxAssessmentId() + 500001);
                         repo.insert(mAssessment);
                     }
                     startActivity(intent);
@@ -258,6 +248,50 @@ public class AssessmentActivity extends AppCompatActivity implements AdapterView
                     repo.delete(mAssessment);
                 }
                 startActivity(intent);
+                return true;
+            case R.id.alertStart:
+                String startAlertMessage = "Set alert for Start date of Assessment?";
+                AlertDialog.Builder startBuilder = new AlertDialog.Builder(AssessmentActivity.this);
+                startBuilder.setTitle("Set Alert")
+                        .setMessage(startAlertMessage)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String startMessage = mAssessment.getAssessmentName() + " is starting at " + mAssessment.getAssessmentStart().format(dateTimeFormatter);
+                                ZoneId zoneId = ZoneId.systemDefault();
+                                ZoneOffset offset = zoneId.getRules().getOffset(mAssessment.getAssessmentStart());
+                                Long startTime = mAssessment.getAssessmentStart().toInstant(offset).toEpochMilli();
+                                if (mAssessment.getAssessmentId() != null){
+                                    setNotification(startTime, startMessage, mAssessment.getAssessmentId() + 50000);
+                                } else {
+                                    setNotification(startTime, startMessage, repo.getMaxAssessmentId() + 50001);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
+                return true;
+            case R.id.alertEnd:
+                String endAlertMessage = "Set alert for End date of Assessment?";
+                AlertDialog.Builder endBuilder = new AlertDialog.Builder(AssessmentActivity.this);
+                endBuilder.setTitle("Set Alerts")
+                        .setMessage(endAlertMessage)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ZoneId zoneId = ZoneId.systemDefault();
+                                ZoneOffset offset = zoneId.getRules().getOffset(mAssessment.getAssessmentStart());
+                                String endMessage = mAssessment.getAssessmentName() + " is ending at " + mAssessment.getAssessmentEnd().format(dateTimeFormatter);
+                                Long endTime = mAssessment.getAssessmentEnd().toInstant(offset).toEpochMilli();
+                                if (mAssessment.getAssessmentId() != null){
+                                    setNotification(endTime, endMessage, mAssessment.getAssessmentId() + 500000);
+                                } else {
+                                    setNotification(endTime, endMessage, repo.getMaxAssessmentId() + 500001);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
                 return true;
         }
         return false;

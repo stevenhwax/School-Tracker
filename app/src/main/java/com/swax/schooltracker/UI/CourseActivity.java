@@ -227,18 +227,9 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
                 mCourse.setInstructorEmail(courseEmailEditText.getText().toString());
                 mCourse.setCourseNotes(courseNotesEditText.getText().toString());
                 if (validateFields()){
-                    String startMessage = mCourse.getCourseName() + " is starting at " + mCourse.getCourseStart().format(formatter);
-                    ZoneId zoneId = ZoneId.systemDefault();
-                    Long startTime = mCourse.getCourseStart().atStartOfDay(zoneId).toInstant().toEpochMilli();
-                    String endMessage = mCourse.getCourseName() + " is ending at " + mCourse.getCourseEnd().format(formatter);
-                    Long endTime = mCourse.getCourseEnd().atStartOfDay(zoneId).toInstant().toEpochMilli();
                     if (mCourse.getCourseId() != null){
-                        setNotification(startTime, startMessage, mCourse.getCourseId());
-                        setNotification(endTime, endMessage, mCourse.getCourseId() + 100000);
                         repo.update(mCourse);
                     } else {
-                        setNotification(startTime, startMessage, repo.getMaxCourseId() + 1);
-                        setNotification(endTime, endMessage, repo.getMaxCourseId() + 100001);
                         repo.insert(mCourse);
                     }
                     startActivity(intent);
@@ -275,6 +266,48 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
                 shareIntent.setType("text/plain");
                 Intent sendIntent = Intent.createChooser(shareIntent, null);
                 startActivity(sendIntent);
+                return true;
+            case R.id.alertStart:
+                String startAlertMessage = "Set alert for Start date of Course?";
+                AlertDialog.Builder startBuilder = new AlertDialog.Builder(CourseActivity.this);
+                startBuilder.setTitle("Set Alerts")
+                        .setMessage(startAlertMessage)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                String startMessage = mCourse.getCourseName() + " is starting at " + mCourse.getCourseStart().format(formatter);
+                                ZoneId zoneId = ZoneId.systemDefault();
+                                Long startTime = mCourse.getCourseStart().atStartOfDay(zoneId).toInstant().toEpochMilli();
+                                if (mCourse.getCourseId() != null){
+                                    setNotification(startTime, startMessage, mCourse.getCourseId());
+                                } else {
+                                    setNotification(startTime, startMessage, repo.getMaxCourseId() + 1);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
+                return true;
+            case R.id.alertEnd:
+                String endAlertMessage = "Set alert for End date of Course?";
+                AlertDialog.Builder endBuilder = new AlertDialog.Builder(CourseActivity.this);
+                endBuilder.setTitle("Set Alerts")
+                        .setMessage(endAlertMessage)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                ZoneId zoneId = ZoneId.systemDefault();
+                                String endMessage = mCourse.getCourseName() + " is ending at " + mCourse.getCourseEnd().format(formatter);
+                                Long endTime = mCourse.getCourseEnd().atStartOfDay(zoneId).toInstant().toEpochMilli();
+                                if (mCourse.getCourseId() != null){
+                                    setNotification(endTime, endMessage, mCourse.getCourseId() + 100000);
+                                } else {
+                                    setNotification(endTime, endMessage, repo.getMaxCourseId() + 100001);
+                                }
+                            }
+                        })
+                        .create()
+                        .show();
                 return true;
         }
         return false;

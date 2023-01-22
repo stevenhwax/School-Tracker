@@ -7,9 +7,6 @@
     <item android:title="Delete"
         android:orderInCategory="100"
         android:id="@+id/delete"/>
-    <item android:title="Share"
-        android:orderInCategory="100"
-        android:id="@+id/share"/>
     <item android:title="Alert Start"
         android:orderInCategory="100"
         android:id="@+id/alertStart"/>
