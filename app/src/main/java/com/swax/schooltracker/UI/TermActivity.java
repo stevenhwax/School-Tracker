@@ -204,7 +204,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 mTerm.setTermName(termNameEditText.getText().toString());
                 mTerm.setTermStart(mTermStart);
                 mTerm.setTermEnd(mTermEnd);
-                mTerm.setTermCourses(mTermAssociatedCourseIds);
+                mTerm.setAssociatedCourses(mTermAssociatedCourseIds);
                 if(validateFields()){
                     /*
                     String startMessage = "Term " + mTerm.getTermName() + " is starting at " + mTerm.getTermStart().format(formatter);
@@ -334,7 +334,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                 } else {
                     List<Integer> courseIds = mTerm.getAssociatedCourses();
                     courseIds.remove(i);
-                    mTerm.setTermCourses(courseIds);
+                    mTerm.setAssociatedCourses(courseIds);
                 }
             }
         }
@@ -347,7 +347,7 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
     public Boolean validateFields(){
         Boolean validated = true;
         String errorMessage = "";
-        if(mTermStart.isAfter(mTermEnd)){
+        if(MiscHelper.checkDates(mTermStart, mTermEnd)){
             validated = false;
             errorMessage = errorMessage + "Start date is after End date.";
         }
@@ -365,14 +365,6 @@ public class TermActivity extends AppCompatActivity implements AdapterView.OnIte
                     .show();
         }
         return validated;
-    }
-
-    public void setNotification(Long trigger, String message){
-        Intent intent = new Intent(TermActivity.this, NotificationReciever.class);
-        intent.putExtra("message", message);
-        PendingIntent sender = PendingIntent.getBroadcast(TermActivity.this, mTerm.getTermId(), intent, PendingIntent.FLAG_IMMUTABLE);
-        AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        am.set(AlarmManager.RTC_WAKEUP, trigger, sender);
     }
 
 }

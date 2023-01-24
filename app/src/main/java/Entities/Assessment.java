@@ -10,7 +10,6 @@ public class Assessment {
 
     @PrimaryKey(autoGenerate = true)
     private Integer assessmentId;
-
     private String assessmentName;
     private LocalDateTime assessmentStart;
     private LocalDateTime assessmentEnd;

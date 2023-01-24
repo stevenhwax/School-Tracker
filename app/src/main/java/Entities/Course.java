@@ -11,7 +11,6 @@ public class Course {
 
     @PrimaryKey(autoGenerate = true)
     private Integer courseId;
-
     private String courseName;
     private LocalDate courseStart;
     private LocalDate courseEnd;

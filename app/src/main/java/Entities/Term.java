@@ -11,7 +11,6 @@ public class Term {
 
     @PrimaryKey(autoGenerate = true)
     private Integer termId;
-
     private String termName;
     private LocalDate termStart;
     private LocalDate termEnd;
@@ -60,7 +59,7 @@ public class Term {
         return associatedCourses;
     }
 
-    public void setTermCourses(List<Integer> termCourses) {
+    public void setAssociatedCourses(List<Integer> termCourses) {
         this.associatedCourses = associatedCourses;
     }
 

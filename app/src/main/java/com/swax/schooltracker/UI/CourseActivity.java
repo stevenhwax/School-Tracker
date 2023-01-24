@@ -408,23 +408,17 @@ public class CourseActivity extends AppCompatActivity implements AdapterView.OnI
         String errorMessage = "";
 
         //Check that Start Date is earlier than End Date
-        if(mCourse.getCourseStart().isAfter(mCourse.getCourseEnd())){
+        if(MiscHelper.checkDates(mCourse.getCourseStart(), mCourse.getCourseEnd())){
             validated = false;
             errorMessage = errorMessage + "Start date is after End Date. \n";
         }
 
-        //Check that the phone number matches expected patterns
-        //Regex care of: https://stackoverflow.com/questions/42104546/java-regular-expressions-to-validate-phone-numbers
-        String phoneRegex = "\\d{10}|(?:\\d{3}-){2}\\d{4}|\\(\\d{3}\\)\\d{3}-?\\d{4}";
-        if(!mCourse.getInstructorPhone().matches(phoneRegex)){
+        if(!MiscHelper.checkPhone(mCourse.getInstructorPhone())){
             validated = false;
             errorMessage = errorMessage + "Phone number is not entered correctly. \n";
         }
 
-        //Check that the email matches expected patterns
-        //Regex care of: https://howtodoinjava.com/java/regex/java-regex-validate-email-address/
-        String emailRegex = "^[\\w!#$%&amp;'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&amp;'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-        if(!mCourse.getInstructorEmail().matches(emailRegex)){
+        if(!MiscHelper.checkEmail(mCourse.getInstructorEmail())){
             validated = false;
             errorMessage = errorMessage + "Email address is not entered correctly. ";
         }
